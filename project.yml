@@ -1,0 +1,443 @@
+# 
+swagger: "2.0"
+info:
+  description: "This is a sample server projecttore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters."
+  version: "1.0.0"
+  title: "Project API Specification"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+# host: "projecttore.swagger.io"
+# basePath: "/v2"
+tags:
+- name: "project"
+  description: "Everything about your project"
+  externalDocs:
+    description: "Find out more"
+    url: "http://swagger.io"
+
+paths:
+  /project:
+    post:
+      tags:
+      - "project"
+      summary: "Create a new project"
+      description: ""
+      operationId: "createProject"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "project object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/projectRequest"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+           $ref: '#/definitions/projectRequest'
+        "400":
+          description: "Bad Request"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "Project Error"
+        "401":
+          description: "Unauthorized"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "User not authenticated"
+        "403":
+          description: "Forbidden"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "User does not have permission to access this route"
+      security:
+      - projecttore_auth:
+        - "write:project"
+        - "read:project"
+    put:
+      tags:
+      - "project"
+      summary: "Update an existing project"
+      description: ""
+      operationId: "updateproject"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Route to update a project’s metadata, including the assigned users to a project."
+        required: true
+        schema:
+          $ref: "#/definitions/projectResponse"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+           $ref: '#/definitions/projectResponse'
+        "400":
+          description: "Bad Request"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "Project Error"
+        "401":
+          description: "Unauthorized"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "User not authenticated"
+        "403":
+          description: "Forbidden"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "User does not have permission to access this route"
+      security:
+      - projecttore_auth:
+        - "write:project"
+        - "read:project"
+  /project/{projectId}:
+    get:
+      tags:
+      - "project"
+      summary: "Find project by ID"
+      description: "Returns a single project"
+      operationId: "getprojectById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "projectId"
+        in: "path"
+        description: "ID of project to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/projectResponse"
+        "401":
+          description: "Unauthorized"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "User not authenticated"
+        "403":
+          description: "Forbidden"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "User does not have permission to access this route"
+      security:
+      - api_key: []
+  /project/listofProduct:
+    get:
+      tags:
+      - "project"
+      summary: "Get list of project"
+      description: "Returns all project current user has read access to"
+      operationId: "listOfproject"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/projectResponse"
+        "400":
+          description: "Bad Request"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "Product Error"
+        "401":
+          description: "Unauthorized"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "User not authenticated"
+        "403":
+          description: "Forbidden"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "User does not have permission to access this route"    
+  /project/{projectId}/role:
+    get:
+      tags:
+      - "project"
+      summary: "Find role by project ID"
+      description: "Retrieves the role the currently logged in user has for the project"
+      operationId: "getRoleByprojectId"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "projectId"
+        in: "path"
+        description: "Project Id"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+           type: "object"
+           properties:
+              projectId:
+               type: "integer"
+               format: "int64"
+               example: "12345"
+              role:
+               type: "string"
+               example: "admin"
+        "401":
+          description: "Unauthorized"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "User not authenticated"
+        "403":
+          description: "Forbidden"
+          schema:
+           type: "object"
+           properties:
+            error:
+             type: "string"
+             example: "User does not have permission to access this route"
+      security:
+      - api_key: []
+securityDefinitions:
+  projecttore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://projecttore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:project: "modify project in your account"
+      read:project: "read your project"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  projectRequest:
+    type: "object"
+    properties:
+      productId:
+        type: "integer"
+        format: "int64"
+        example: "789"
+      type:
+        type: "string"
+        example: "LINE_EXTENSION"
+      status:
+        type: "string"
+        example: "PENDING"
+      assignedUsers:
+        type: "object"
+        properties:
+          id:
+           type: "integer"
+           format: "int64"
+           example: "12342342"
+          role:
+           type: "string"
+           example: "APPROVER"
+      code:
+        type: "string"
+        example: "456"
+        description: "project code"
+      colorLocationMap:
+        type: "array"
+        items:
+          type: "string"
+          example: "redloc, greenloc"
+      releaseName:
+        type: "string"
+        example: "Beats Pro"
+        description: "project release name"
+      modelNumber:
+        type: "string"
+        example: "789"
+        description: "project model number"
+  projectResponse:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        format: "int64"
+        example: "789"
+      productId:
+        type: "integer"
+        format: "int64"
+        example: "894"
+      type:
+        type: "string"
+        example: "LINE_EXTENSION"
+      status:
+        type: "string"
+        description: "project status"
+        example: "pending"
+      assignedUsers:
+        type: "array"
+        items:
+         type: "object"
+         properties:
+          id:
+            type: "integer"
+            format: "int64"
+            example: "111"
+          role:
+            type: "string"
+            example: "ADMIN"
+          firstName:
+            type: "string"
+            example: "Jon"
+          lastName:
+            type: "string"
+            example: "Smith"
+          displayName:
+            type: "string"
+            example: "Jonny"
+          email:
+            type: "string"
+            example: "jon@apple.com"
+      cartons:
+        type: "array"
+        items:
+         type: "object"
+         properties:
+          id:
+            type: "integer"
+            format: "int64"
+            example: 789
+          projectMPN:
+            type: "string"
+            example: "projectMPN"
+          location:
+            type: "string"
+            example: "US"
+          color:
+            type: "integer"
+            format: "int64"
+            example: "111"
+          description:
+            type: "string"
+            example: "US, Black"
+          gs1Label:
+            type: "integer"
+            format: "int64"
+            example: 789
+          snListLabel:
+            type: "integer"
+            format: "int64"
+            example: 120
+          catonItem:
+            type: "array"
+            items:
+              type: "string"
+              example: "item1, item2"
+          validationStatus:
+             type: "string"
+             example: "pendingApproval"
+      code:
+        type: "string"
+        example: "456"
+        description: "project code"
+      colorLocationMap:
+        type: "array"
+        items:
+         type: "object"
+         properties:
+          color:
+            type: "object"
+            properties:
+                  id:
+                   type: integer
+                   format: int64
+                   example: 6666
+                  code:
+                   type: string
+                   example: "CA"
+                  releaseName:
+                   type: string
+                   example: "Black"
+                  projectId:
+                   type: integer
+                   format: int64
+                   example: 999
+          location:
+            type: "array"
+            items:
+             type: "object"
+             properties:
+                  id:
+                   type: integer
+                   format: int64
+                   example: 444
+                  regionCode:
+                   type: string
+                   example: "LL"
+                  localeCode:
+                   type: string
+                   example: "US"
+                  projectId:
+                   type: integer
+                   format: int64
+                   example: 999
+      releaseName:
+        type: "string"
+        example: "Beats Pro"
+        description: "project release name"
+      modelNumber:
+        type: "string"
+        example: "789"
+        description: "project model number"
+        
+    xml:
+      name: "project"
+  
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
+# Added by API Auto Mocking Plugin
+host: virtserver.swaggerhub.com
+basePath: /ashisbanikjob/swagger-petstore/1.0.0
+schemes:
+ - https
